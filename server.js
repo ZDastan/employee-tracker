@@ -78,17 +78,15 @@ const db = mysql.createConnection(
   }; 
   
   function viewAllDepartments() {
-    const sql = `SELECT employee.id, employee.name FROM department`;
-    db.query(sql, (err, result) => {
-        if (err) {
-            answer.status(500).json({ error: err.message })
-            return;
-        }
-        console.table(result);
-        startPrompt();
-    });
-};
-
+    const sql = `SELECT department.id, department.name FROM department`;
+    db.promise().query(sql).then(([data]) =>{
+        let departments = data
+    const options = departments.map(({ id, name }) => ({value: id, name: name}))
+    console.table(options);
+    startPrompt();
+    })};
+    
+    
 function viewAllRoles() {
     const sql = `SELECT role.id, role.title, role.department_id, role.salary FROM role`;
     db.query(sql, (err, result) => {
@@ -113,29 +111,51 @@ function viewAllEmployees() {
     });
 };
 
-function addDepartment() { 
 
-    inquirer.prompt([
-        {
-          name: "name",
-          type: "input",
-          message: "What is the name off the department?"
+const addDepartment = () => {
+    inquirer
+      .prompt({
+        name: "department_name",
+        type: "input",
+        message: "What is the name off the department?",
+      })
+      .then((input) => {
+        if (input) {
+          console.log(input);
+          let sql = `INSERT INTO department (name) VALUES ("${input.department_name}");`;
+  
+          con.query(sql, (err, row) => {
+            if (err) throw err;
+            startPrompt();
+          });
         }
-    ]).then(function(res) {
-        var query = connection.query(
-            "INSERT INTO department SET ? ",
-            {
-              name: res.name
+      });
+  };
+  
+
+// function addDepartment() { 
+
+//     inquirer.prompt([
+//         {
+//           name: "name",
+//           type: "input",
+//           message: "What is the name off the department?"
+//         }
+//     ]).then(function(res) {
+//         var query = connection.query(
+//             "INSERT INTO department SET ? ",
+//             {
+//               name: res.name
             
-            },
-            function(err) {
-                if (err) throw err
-                console.table(res);
-                startPrompt();
-            }
-        )
-    })
-  }
+//             },
+//             function(err) {
+//                 if (err) throw err
+//                 console.table(res);
+//                 startPrompt();
+//             }
+//         )
+//     })
+//   }
 
   function addRole() { 
     connection.query("SELECT role.title AS Title, role.salary AS Salary,role.department AS Department FROM role",   function(err, res) {
@@ -223,7 +243,6 @@ function addDepartment() {
     
       })
     };
-
     
 
        
