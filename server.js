@@ -42,6 +42,7 @@ const db = mysql.createConnection(
                 'Add Role', 
                 'Add an Employee', 
                 'Update an Employee Role',
+                'Update Employee Manager',
                 'Quite'
             ] 
         }
@@ -67,6 +68,9 @@ const db = mysql.createConnection(
                 break;
             case 'Update an Employee Role':
                 updateEmployeeRole();
+                break;
+            case 'Update Employee Manager':
+                updateEmployeeManager();
                 break;
             case 'Quite':
                 console.log('Thank you for using the employee database!');
@@ -202,6 +206,34 @@ function updateEmployeeRole() {
 });
 };
 
+function updateEmployeeManager() {
+    inquirer.prompt([
+        {
+            name: "first_name",
+            type: "input",
+            message: "Which employee's manager do you want to update?"
+        },
+        {
+            name: "manager_id",
+            type: "number",
+            message: "Which manager do you want to update for selected employee? Enter ONLY role id numbers."
+        }
+    ]).then(function (response) {
+        db.query("UPDATE employee SET manager_id = ? WHERE first_name = ?", [response.manager_id, response.first_name], function (err, data) {
+            if (err) throw err;
+            console.log('The new role entered has been added successfully to the database.');
+
+            db.query(`SELECT * FROM employee`, (err, result) => {
+                if (err) {
+                    res.status(500).json({ error: err.message })
+                    startPrompt();
+                }
+                console.table(result);
+                startPrompt();
+            });
+        })
+});
+};
 
 
        
