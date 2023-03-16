@@ -37,7 +37,8 @@ const db = mysql.createConnection(
             choices: [
                 'View All Departments', 
                 'View All Roles', 
-                'View All Employees', 
+                'View All Employees',
+                'View Employee by Manager', 
                 'Add a Department', 
                 'Add Role', 
                 'Add an Employee', 
@@ -56,6 +57,9 @@ const db = mysql.createConnection(
                 break;
             case 'View All Employees':
                 viewAllEmployees();
+                break;
+            case 'View Employee by Manager':
+                viewEmployeeByManager();
                 break;
             case 'Add a Department':
                 addDepartment();
@@ -114,6 +118,19 @@ function viewAllEmployees() {
         startPrompt();
     });
 };
+function viewEmployeeByManager() {
+    const sql = `SELECT employee.manager_id, employee.first_name FROM employee`;
+    db.query(sql, (err, result) => {
+        if (err) {
+            res.status(500).json({ error: err.message })
+            return;
+        }
+        console.table(result);
+        startPrompt();
+    });
+};
+
+
 
 
 const addDepartment = () => {
