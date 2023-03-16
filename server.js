@@ -171,7 +171,36 @@ const addRole =() => {
                   });
                 }
               });
-}
+};
+
+function updateEmployeeRole() {
+    inquirer.prompt([
+        {
+            name: "first_name",
+            type: "input",
+            message: "Which employee's role do you want to update?"
+        },
+        {
+            name: "role_id",
+            type: "number",
+            message: "Which role do you want to assign the selected employee? Enter ONLY role id numbers."
+        }
+    ]).then(function (response) {
+        db.query("UPDATE employee SET role_id = ? WHERE first_name = ?", [response.role_id, response.first_name], function (err, data) {
+            if (err) throw err;
+            console.log('The new role entered has been added successfully to the database.');
+
+            db.query(`SELECT * FROM employee`, (err, result) => {
+                if (err) {
+                    res.status(500).json({ error: err.message })
+                    startPrompt();
+                }
+                console.table(result);
+                startPrompt();
+            });
+        })
+});
+};
 
 
 
