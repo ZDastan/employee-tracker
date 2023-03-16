@@ -41,7 +41,7 @@ const db = mysql.createConnection(
                 'Add a Department', 
                 'Add Role', 
                 'Add an Employee', 
-                'Update and Employee Role',
+                'Update an Employee Role',
                 'Quite'
             ] 
         }
@@ -56,16 +56,16 @@ const db = mysql.createConnection(
             case 'View All Employees':
                 viewAllEmployees();
                 break;
-            case 'Add A Department':
+            case 'Add a Department':
                 addDepartment();
                 break;
-            case 'Add A Role':
+            case 'Add  Role':
                 addRole();
                 break;
-            case 'Add An Employee':
+            case 'Add an Employee':
                 addEmployee();
                 break;
-            case 'Update An Employee Role':
+            case 'Update an Employee Role':
                 updateEmployeeRole();
                 break;
             case 'Quite':
@@ -124,7 +124,7 @@ const addDepartment = () => {
           console.log(input);
           let sql = `INSERT INTO department (name) VALUES ("${input.department_name}");`;
   
-          con.query(sql, (err, row) => {
+          db.query(sql, (err, row) => {
             if (err) throw err;
             startPrompt();
           });
@@ -132,74 +132,87 @@ const addDepartment = () => {
       });
   };
   
-
-// function addDepartment() { 
-
-//     inquirer.prompt([
-//         {
-//           name: "name",
-//           type: "input",
-//           message: "What is the name off the department?"
+const addRole =() => {
+    inquirer.prompt([
+                  {
+                    name: "title",
+                    type: "input",
+                    message: "What is the name of the role?"
+                  },
+                  {
+                    name: "salary",
+                    type: "input",
+                    message: "What is the salary of the role?"
+          
+                  },
+                  {
+                    type: 'list',
+                    name: 'department_name',
+                    message: "Which department does the role belong to?",
+                    choices: [
+                        ('Marketing'),
+                        ('Customer Service'), 
+                        ('Accounting'), 
+                        ('Sales'), 
+                        ('Finance')
+                    ] 
+                }
+              ]) 
+              .then((input) => {
+                if (input) {
+                  console.log(input);
+                  let sql = `INSERT INTO department (name) VALUES ("${input.title}, ${input.salary}, ${list.department_name}");`;
+          
+                  db.query(sql, (err, row) => {
+                    if (err) throw err;
+                    startPrompt();
+                  });
+                }
+              });
+}
+//   function addRole() { 
+//     db.query("SELECT role.title AS Title, role.salary AS Salary,role.department AS Department FROM role",   function(err, res) {
+//       inquirer.prompt([
+//           {
+//             name: "title",
+//             type: "input",
+//             message: "What is the name of the role?"
+//           },
+//           {
+//             name: "salary",
+//             type: "input",
+//             message: "What is the salary of the role?"
+  
+//           },
+//           {
+//             type: 'list',
+//             name: 'department',
+//             message: "Which department does the role belong to?",
+//             choices: [
+//                 ('Marketing'),
+//                 ('Customer Service'), 
+//                 ('Accounting'), 
+//                 ('Sales'), 
+//                 ('Finance')
+//             ] 
 //         }
-//     ]).then(function(res) {
-//         var query = connection.query(
-//             "INSERT INTO department SET ? ",
-//             {
-//               name: res.name
-            
-//             },
-//             function(err) {
-//                 if (err) throw err
-//                 console.table(res);
-//                 startPrompt();
-//             }
-//         )
-//     })
-//   }
-
-  function addRole() { 
-    connection.query("SELECT role.title AS Title, role.salary AS Salary,role.department AS Department FROM role",   function(err, res) {
-      inquirer.prompt([
-          {
-            name: "title",
-            type: "input",
-            message: "What is the name of the role?"
-          },
-          {
-            name: "salary",
-            type: "input",
-            message: "What is the salary of the role?"
+//       ]).then(function(res) {
+//           db.query(
+//               "INSERT INTO role SET ?",
+//               {
+//                 title: res.Title,
+//                 salary: res.Salary,
+//               },
+//               function(err) {
+//                   if (err) throw err
+//                   console.table(res);
+//                   startPrompt();
+//               }
+//           )
   
-          },
-          {
-            type: 'list',
-            name: 'department',
-            message: "Which department does the role belong to?",
-            choices: [
-                ('Marketing'),
-                ('Customer Service'), 
-                ('Accounting'), 
-                ('Sales'), 
-                ('Finance')
-            ] 
-        }
-      ]).then(function(res) {
-          connection.query(
-              "INSERT INTO role SET ?",
-              {
-                title: res.Title,
-                salary: res.Salary,
-              },
-              function(err) {
-                  if (err) throw err
-                  console.table(res);
-                  startPrompt();
-              }
-          )
-  
-      });
-    });
-    }
+//       });
+//     });
+//     }
 
     function addEmployee() { 
         inquirer.prompt([
@@ -228,7 +241,7 @@ const addDepartment = () => {
         ]).then(function (val) {
           var roleId = selectRole().indexOf(val.role) + 1
           var managerId = selectManager().indexOf(val.choice) + 1
-          connection.query("INSERT INTO employee SET ?", 
+          db.query("INSERT INTO employee SET ?", 
           {
               first_name: val.firstName,
               last_name: val.lastName,
