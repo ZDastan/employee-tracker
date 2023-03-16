@@ -59,7 +59,7 @@ const db = mysql.createConnection(
             case 'Add a Department':
                 addDepartment();
                 break;
-            case 'Add  Role':
+            case 'Add Role':
                 addRole();
                 break;
             case 'Add an Employee':
@@ -161,101 +161,18 @@ const addRole =() => {
               .then((input) => {
                 if (input) {
                   console.log(input);
-                  let sql = `INSERT INTO department (name) VALUES ("${input.title}, ${input.salary}, ${list.department_name}");`;
+                  let sql = `INSERT INTO department (name) VALUES ("${input.title}, ${input.salary}, ${input.department_name}");`;
+                  //let sql = `INSERT INTO role (department_id, title, salary) VALUES ("${id}", "${title}", "${salary}");`;
           
                   db.query(sql, (err, row) => {
                     if (err) throw err;
+                    console.log("Role added");
                     startPrompt();
                   });
                 }
               });
 }
-//   function addRole() { 
-//     db.query("SELECT role.title AS Title, role.salary AS Salary,role.department AS Department FROM role",   function(err, res) {
-//       inquirer.prompt([
-//           {
-//             name: "title",
-//             type: "input",
-//             message: "What is the name of the role?"
-//           },
-//           {
-//             name: "salary",
-//             type: "input",
-//             message: "What is the salary of the role?"
-  
-//           },
-//           {
-//             type: 'list',
-//             name: 'department',
-//             message: "Which department does the role belong to?",
-//             choices: [
-//                 ('Marketing'),
-//                 ('Customer Service'), 
-//                 ('Accounting'), 
-//                 ('Sales'), 
-//                 ('Finance')
-//             ] 
-//         }
-//       ]).then(function(res) {
-//           db.query(
-//               "INSERT INTO role SET ?",
-//               {
-//                 title: res.Title,
-//                 salary: res.Salary,
-//               },
-//               function(err) {
-//                   if (err) throw err
-//                   console.table(res);
-//                   startPrompt();
-//               }
-//           )
-  
-//       });
-//     });
-//     }
 
-    function addEmployee() { 
-        inquirer.prompt([
-            {
-              name: "firstname",
-              type: "input",
-              message: "What is the employee's firt name? "
-            },
-            {
-              name: "lastname",
-              type: "input",
-              message: "What is the employee's last name? "
-            },
-            {
-              name: "role",
-              type: "list",
-              message: "What is the employee's role? ",
-              choices: selectRole()
-            },
-            {
-                name: "choice",
-                type: "rawlist",
-                message: "Who is the employee's managers?",
-                choices: selectManager()
-            }
-        ]).then(function (val) {
-          var roleId = selectRole().indexOf(val.role) + 1
-          var managerId = selectManager().indexOf(val.choice) + 1
-          db.query("INSERT INTO employee SET ?", 
-          {
-              first_name: val.firstName,
-              last_name: val.lastName,
-              manager_id: managerId,
-              role_id: roleId
-              
-          }, function(err){
-              if (err) throw err
-              console.table(val)
-              startPrompt()
-          })
-    
-      })
-    };
-    
+
 
        
