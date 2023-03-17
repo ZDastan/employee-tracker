@@ -45,6 +45,7 @@ const db = mysql.createConnection(
                 'Add an Employee', 
                 'Update an Employee Role',
                 'Update Employee Manager',
+                'Delete Department',
                 'Quite'
             ] 
         }
@@ -79,6 +80,9 @@ const db = mysql.createConnection(
                 break;
             case 'Update Employee Manager':
                 updateEmployeeManager();
+                break;
+            case 'Delete Department':
+                deleteDepartment();
                 break;
             case 'Quite':
                 console.log('Thank you for using the employee database!');
@@ -268,6 +272,28 @@ function updateEmployeeManager() {
         })
 });
 };
+
+const deleteDepartment = () => {
+    inquirer
+      .prompt({
+        name: "department_name",
+        type: "input",
+        message: "What is the name off the department you like to delete?",
+      })
+      .then((input) => {
+        if (input) {
+          console.log(input);
+          let sql = `DELETE FROM department WHERE name = ? ("${input.department_name}");`;
+      
+  
+          db.query(sql, (err, row) => {
+            if (err) throw err;
+            console.log("The department name entered has been deleted successfully from the database.");
+            startPrompt();
+          });
+        }
+      });
+  };
 
 
        
