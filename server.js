@@ -42,10 +42,12 @@ const db = mysql.createConnection(
                 'View Employee by Department', 
                 'Add a Department', 
                 'Add Role', 
-                'Add an Employee', 
+                'Add Employee', 
                 'Update an Employee Role',
                 'Update Employee Manager',
                 'Delete Department',
+                'Delete Employee',
+                'Delete Role',
                 'Quite'
             ] 
         }
@@ -72,7 +74,7 @@ const db = mysql.createConnection(
             case 'Add Role':
                 addRole();
                 break;
-            case 'Add an Employee':
+            case 'Add Employee':
                 addEmployee();
                 break;
             case 'Update an Employee Role':
@@ -83,6 +85,12 @@ const db = mysql.createConnection(
                 break;
             case 'Delete Department':
                 deleteDepartment();
+                break;
+            case 'Delete Role':
+                deleteRole();
+                break;
+            case 'Delete Employee':
+                deleteEmployee();
                 break;
             case 'Quite':
                 console.log('Thank you for using the employee database!');
@@ -173,6 +181,7 @@ const addDepartment = () => {
         }
       });
   };
+
   
 const addRole =() => {
     inquirer.prompt([
@@ -209,6 +218,52 @@ const addRole =() => {
                   db.query(sql, (err, row) => {
                     if (err) throw err;
                     console.log("Role added");
+                    startPrompt();
+                  });
+                }
+              });
+};
+
+
+const addEmployee =() => {
+    inquirer.prompt([
+                  {
+                    name: "first_name",
+                    type: "input",
+                    message: "What is first name for new Employee?"
+                  },
+                  {
+                    name: "last_name",
+                    type: "input",
+                    message: "What is last name of new employee?"
+          
+                  },
+                  {
+                    name: "title",
+                    type: "input",
+                    message: "What is the name of the role new employee belong to?"
+                  },
+                  {
+                    type: 'list',
+                    name: 'department_name',
+                    message: "Which department does the new employee belong to?",
+                    choices: [
+                        ('Marketing'),
+                        ('Customer Service'), 
+                        ('Accounting'), 
+                        ('Sales'), 
+                        ('Finance')
+                    ] 
+                }
+              ]) 
+              .then((input) => {
+                if (input) {
+                  console.log(input);
+                  let sql = `INSERT INTO employee (name) VALUES ("${input.first_name}, ${input.last_name}, ${input.title}, ${input.name}");`;
+                  
+                  db.query(sql, (err, row) => {
+                    if (err) throw err;
+                    console.table("New employee added");
                     startPrompt();
                   });
                 }
@@ -283,12 +338,12 @@ const deleteDepartment = () => {
       .then((input) => {
         if (input) {
           console.log(input);
-          let sql = `DELETE FROM department WHERE name = ? ("${input.department_name}");`;
+          let sql = `DELETE FROM department WHERE name = "${input.department_name}";`
       
   
           db.query(sql, (err, row) => {
             if (err) throw err;
-            console.log("The department name entered has been deleted successfully from the database.");
+            console.log("The department entered has been deleted successfully from the database.");
             startPrompt();
           });
         }
@@ -296,4 +351,47 @@ const deleteDepartment = () => {
   };
 
 
-       
+  const deleteRole = () => {
+    inquirer
+      .prompt({
+        name: "role_id",
+        type: "input",
+        message: "which role you like to delete?Pls enetr id number.",
+      })
+      .then((input) => {
+        if (input) {
+          console.log(input);
+          let sql = `DELETE FROM role WHERE id = "${input.role_id}";`
+      
+  
+          db.query(sql, (err, row) => {
+            if (err) throw err;
+            console.log("The role entered has been deleted successfully from the database.");
+            startPrompt();
+          });
+        }
+      });
+  };
+
+  const deleteEmployee = () => {
+    inquirer
+      .prompt({
+        name: "id",
+        type: "input",
+        message: "Pls enter employee id that you like to delete.",
+      })
+      .then((input) => {
+        if (input) {
+          console.log(input);
+          let sql = `DELETE FROM employee WHERE id = "${input.id}";`
+      
+  
+          db.query(sql, (err, row) => {
+            if (err) throw err;
+            console.log("The employee entered has been deleted successfully from the database.");
+            startPrompt();
+          });
+        }
+      });
+  };
+      
