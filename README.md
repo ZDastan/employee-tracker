@@ -33,9 +33,15 @@ Provide instructions and examples for use. Include screenshots as needed.
 
 To add a screenshot, create an `assets/images` folder in your repository and upload your screenshot to it. Then, using the relative filepath, add it to your README using the following syntax:
 
-    ```md
-    ![alt text](assets/images/screenshot.png)
-    ``
+    
+    
+![alt text](./assets/image/Screenshot%202023-03-20%20at%2008.31.29.png)
+
+    
     
     https://github.com/ZDastan/employee-tracker
+
+    https://drive.google.com/file/d/1LmtVE2wx11AGxaBiw2ZwohVFkNgdW0tC/view
+
+
 

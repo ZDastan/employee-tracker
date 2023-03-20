@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 
 const inquirer = require('inquirer');
+const { index } = require('mathjs');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -48,6 +49,7 @@ const db = mysql.createConnection(
                 'Delete Department',
                 'Delete Employee',
                 'Delete Role',
+                'View the total utilized budget of a department',
                 'Quite'
             ] 
         }
@@ -92,6 +94,9 @@ const db = mysql.createConnection(
             case 'Delete Employee':
                 deleteEmployee();
                 break;
+            case 'View the total utilized budget of a department':
+                    viewBuget();
+                    break;
             case 'Quite':
                 console.log('Thank you for using the employee database!');
                 db.end();
@@ -100,6 +105,12 @@ const db = mysql.createConnection(
         }
     })
   }; 
+
+  async function viewBuget(){
+    const result = await db.promise().query('SELECT department.id, department.name, SUM(role.salary) AS budget FROM employee LEFT JOIN role on employee.role_id =role.id LEFT JOIN department on role.department_id = department.id group by department.id, department.name;')
+
+    console.table(result[0]);
+  }
   
   function viewAllDepartments() {
     const sql = `SELECT department.id, department.name FROM department`;
@@ -225,8 +236,12 @@ const addRole =() => {
 };
 
 
-const addEmployee =() => {
-    inquirer.prompt([
+const addEmployee = async () => {
+    const result = await db.promise().query('SELECT * FROM employee;')
+    const data = await db.promise().query('SELECT * FROM role;')
+    const roles = data[0].map(({id, title})=>({name:title, value:id}))
+    const employees = result[0].map(({id, first_name, last_name})=>({name:`${first_name} ${last_name}`, value:id}))
+    const input = await inquirer.prompt([
                   {
                     name: "first_name",
                     type: "input",
@@ -239,35 +254,30 @@ const addEmployee =() => {
           
                   },
                   {
-                    name: "title",
-                    type: "input",
-                    message: "What is the name of the role new employee belong to?"
+                    name: "role_id",
+                    type: "list",
+                    message: "What is the name of the role new employee belong to?",
+                    choices: roles
                   },
                   {
-                    type: 'list',
-                    name: 'department_name',
-                    message: "Which department does the new employee belong to?",
-                    choices: [
-                        ('Marketing'),
-                        ('Customer Service'), 
-                        ('Accounting'), 
-                        ('Sales'), 
-                        ('Finance')
-                    ] 
+                    name: "manager_id",
+                    type: "list",
+                    message: "What is the id of the manager for new employee belong to?",
+                    choices: employees
                 }
               ]) 
-              .then((input) => {
+              
                 if (input) {
                   console.log(input);
-                  let sql = `INSERT INTO employee (name) VALUES ("${input.first_name}, ${input.last_name}, ${input.title}, ${input.name}");`;
+                  let sql = `INSERT INTO employee (first_name, last_name,role_id, manager_id) VALUES ("${input.first_name}", "${input.last_name}", ${input.role_id}, ${input.manager_id});`;
                   
                   db.query(sql, (err, row) => {
                     if (err) throw err;
                     console.table("New employee added");
                     startPrompt();
                   });
-                }
-              });
+                
+              };
 };
 
 function updateEmployeeRole() {
